@@ -4,7 +4,8 @@ A modern, interactive artist homepage for Gignite.
 
 ## Getting Started
 
-Open `index-supplier.html` in your browser to view the page.
+- Open `index-artists.html` to view the artist homepage
+- Open `index-supplier.html` to view the supplier homepage
 
 ## Features
 
@@ -12,6 +13,8 @@ Open `index-supplier.html` in your browser to view the page.
 - Responsive design
 - Particle canvas effects
 - Card-based service selection interface
+- Logo animation with interactive hover effects
+- Glitch bar animations on section dividers
 
 ## Technologies
 
@@ -21,3 +24,6 @@ Open `index-supplier.html` in your browser to view the page.
 - Tailwind CSS (via CDN)
 - Font Awesome (via CDN)
 
+## GitHub Pages
+
+View the live site at: https://1984drum.github.io/artist-gignite/
