@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gignite for Artists | Your Audience Awaits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/218e17b06d.js" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="https://use.typekit.net/shl8iso.css">
+    <style>
+        :root {
+            --brand-blue: #00dee3;
+            --font-display: "brother-1816", sans-serif;
+            --square-dimension: 19.5vw;
+            --top-offset: var(--square-dimension);
+            --left-offset: calc(var(--square-dimension) + 2rem);
+            --vertical-gap: 1.75rem;
+        }
+        
+        /* --- Font & Global Styles --- */
+        body {
+            font-family: "brother-1816", "neue-haas-grotesk-display", sans-serif;
+            font-weight: 500;
+            scroll-behavior: smooth;
+            color: #fff;
+            background-color: #000;
+        }
+
+        .font-light { font-weight: 300 !important; }
+        .font-semibold { font-weight: 600 !important; }
+        .font-bold { font-weight: 700 !important; }
+        .font-extrabold { font-weight: 800 !important; }
+        .font-black { font-weight: 900 !important; }
+        
+        .text-gray-200, .text-gray-300, .text-gray-400, .text-gray-500 {
+            color: #fff !important;
+        }
+
+        /* --- Header Styles from Supplier Registration --- */
+        .page-wrapper {
+            position: relative;
+        }
+        
+        .decorative-ui {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .logo-stack {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--square-dimension);
+            height: var(--square-dimension);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            z-index: 10;
+        }
+        
+        .logo-text-item {
+            color: white;
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 4.2vw;
+            letter-spacing: -0.05em;
+            white-space: nowrap;
+            line-height: 0.75;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+        
+        .logo-text-item span {
+            display: inline-block;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+        
+        .background-text {
+            position: absolute;
+            top: -2vw;
+            left: calc(var(--square-dimension) - 1vw);
+            font-family: var(--font-display);
+            font-size: 20vw;
+            font-weight: 900;
+            color: rgba(75, 75, 75, 0.4);
+            z-index: 0;
+            line-height: 0.8;
+            user-select: none;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        
+        .horizontal-line-container {
+            position: absolute;
+            top: var(--top-offset);
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #fff;
+            z-index: 9;
+        }
+        
+        .vertical-line-container {
+            position: absolute;
+            top: 0;
+            left: var(--square-dimension);
+            width: 3px;
+            height: 100%;
+            background-color: #fff;
+            transition: opacity 0.3s ease;
+            z-index: 8;
+        }
+
+        /* --- Background Overlay --- */
+        .section-bg {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        
+        .section-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+            transition: background-color 1s ease-in-out;
+        }
+
+        #hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: min-height 1s cubic-bezier(0.76, 0, 0.24, 1);
+            padding-top: calc(var(--top-offset) + var(--vertical-gap) + 2rem);
+        }
+
+        #hero-section.hero-shrunk {
+            min-height: 0;
+        }
+
+        #hero-section::before {
+            background-color: #000;
+        }
+        
+        #hero-section.bg-visible::before {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .section-bg > .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* --- Section Divider --- */
+        .section-divider {
+            position: relative;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            overflow: visible;
+            margin-top: -2px;
+            z-index: 5;
+        }
+        
+        .glitch-bar-interactive {
+            position: absolute;
+            width: 90px;
+            height: 9px;
+            background-color: #00dee3;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 0.1s linear;
+            z-index: 12;
+        }
+        
+        .glitch-bar-interactive.glitching-1 { animation: equalizer-glitch-1 0.7s steps(2, end); transition: none; }
+        .glitch-bar-interactive.glitching-2 { animation: equalizer-glitch-2 0.6s steps(1, end); transition: none; }
+        .glitch-bar-interactive.glitching-3 { animation: equalizer-glitch-3 0.8s ease-in-out; transition: none; }
+
+        /* --- Text Reveal Animation --- */
+        .reveal-text {
+            visibility: hidden;
+            display: inline-block;
+            padding-bottom: 0.2em;
+            margin-bottom: -0.2em;
+        }
+        
+        .is-revealing {
+            visibility: visible;
+            animation: reveal-left-to-right forwards;
+        }
+        
+        #reveal-line-1 { animation-duration: 0.8s; }
+        #reveal-line-2 { animation-duration: 1.2s; }
+        .reveal-phrase { animation-duration: 0.6s; }
+
+        @keyframes reveal-left-to-right {
+            from { clip-path: inset(0 100% 0 0); }
+            to { clip-path: inset(0 0 0 0); }
+        }
+
+        #highlight-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        #highlight-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 1.5s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        
+        #highlight-container.is-highlighting::before {
+            transform: scaleX(1);
+        }
+
+        /* --- Particle Canvas --- */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 2.5s ease-in-out;
+        }
+
+        /* --- Glitch Button --- */
+        .glitch-button {
+            position: relative;
+            background: rgba(0, 0, 0, 0.35);
+            border: 3px solid #00dee3;
+            color: #fff;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .glitch-button:hover {
+            background: #00dee3;
+            color: #000;
+        }
+
+        /* --- Feature Cards --- */
+        .feature-card {
+            perspective: 1000px;
+        }
+        
+        .feature-card-inner {
+            border: 3px solid white;
+            transition: transform 0.1s linear, background-color 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+
+        /* --- Section Transitions --- */
+        #value-prop-section {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out 0.5s;
+        }
+        
+        #value-prop-section.is-visible {
+            opacity: 1;
+        }
+
+        #features-section {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        #features-section.is-visible {
+            opacity: 1;
+        }
+
+        #benefits-section {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        #benefits-section.is-visible {
+            opacity: 1;
+        }
+
+        /* --- Keyframes --- */
+        @keyframes equalizer-glitch-1 {
+            0% { left: 80vw; transform: translateY(-50%) skewX(-20deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);}
+            15% { left: 20vw; clip-path: polygon(0 0, 20% 0, 25% 100%, 0 100%, 30% 0, 50% 0, 55% 100%, 25% 100%, 60% 0, 80% 0, 85% 100%, 55% 100%, 100% 0, 100% 0, 100% 100%, 85% 100%); }
+            30% { left: 50vw; transform: translateY(-50%) skewX(0); }
+            45% { clip-path: polygon(0 0, 100% 0, 100% 20%, 0 30%, 0 50%, 100% 40%, 100% 70%, 0 60%, 0 80%, 100% 90%, 100% 100%, 0 100%); }
+            60% { left: 10vw; transform: translateY(-50%) skewX(30deg); }
+            75% { clip-path: polygon(0 0, 5% 0, 10% 100%, 0% 100%); }
+            90% { left: 90vw; transform: translateY(-50%) skewX(0); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            100% { left: var(--cursor-x, 50%); }
+        }
+        
+        @keyframes equalizer-glitch-2 {
+            0%, 100% { left: var(--cursor-x, 50%); clip-path: inset(0 0 0 0); }
+            20% { left: 10vw; clip-path: inset(0 80% 0 0); }
+            40% { left: 90vw; clip-path: inset(0 0 0 80%); }
+            60% { left: 40vw; clip-path: inset(40% 0 40% 0); }
+            80% { left: 60vw; clip-path: inset(0 40% 0 40%); }
+        }
+        
+        @keyframes equalizer-glitch-3 {
+            0% { transform: translateY(-50%) scaleY(1); left: 30vw; }
+            25% { transform: translateY(-150%) scaleY(3); left: 50vw; }
+            50% { transform: translateY(50%) scaleY(0.5); left: 70vw; }
+            75% { transform: translateY(-50%) scaleY(1); left: 20vw; }
+            100% { transform: translateY(-50%) scaleY(1); left: var(--cursor-x, 50%); }
+        }
+
+        /* --- Responsive Styles --- */
+        @media (max-width: 1050px) {
+            .vertical-line-container,
+            .logo-stack {
+                display: none;
+            }
+
+            .background-text {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --top-offset: max(var(--square-dimension), 5.75rem);
+            }
+            
+            #hero-section {
+                padding-top: calc(var(--top-offset) + var(--vertical-gap) + 1rem);
+            }
+        }
+    </style>
+</head>
+<body class="bg-black antialiased">
+
+    <div class="page-wrapper">
+        <div class="decorative-ui">
+            <div class="logo-stack">
+                <div class="logo-text-item">GIGNITE</div>
+                <div class="logo-text-item">GIGNITE</div>
+                <div class="logo-text-item">GIGNITE</div>
+                <div class="logo-text-item">GIGNITE</div>
+                <div class="logo-text-item">GIGNITE</div>
+            </div>
+            <div class="background-text">GIGNITE</div>
+            <div class="horizontal-line-container"></div>
+            <div class="vertical-line-container"></div>
+        </div>
+
+        <main>
+            <section id="hero-section" class="text-center py-20 md:py-32 px-6 section-bg" style="background-image: url('https://i.ibb.co/4H8vGKp/1984drum-A-dynamic-long-exposure-photograph-The-static-stage-bae7371a-36d3-4059-ade3-cc5e0263b42f-3.png');">
+                <canvas id="particle-canvas"></canvas>
+                <div class="container mx-auto">
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter mb-12">
+                        <span id="reveal-line-1" class="reveal-text">YOUR AUDIENCE AWAITS</span>
+                    </h1>
+                    <div class="max-w-3xl mx-auto">
+                        <div id="highlight-container">
+                            <p class="text-xl md:text-2xl font-light relative z-10 p-2">
+                                <span id="reveal-phrase-1" class="reveal-text reveal-phrase">Our platform will help you build out your tour plan step by step,</span>
+                                <span id="reveal-phrase-2" class="reveal-text reveal-phrase"> making your ambitions a reality.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section id="value-prop-section" class="py-20 md:py-32 px-6 section-bg" style="background-image: url('https://i.ibb.co/zTDRFJN2/GN-65.png');">
+                <div class="container mx-auto text-center">
+                    <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-8">
+                        PLANNING, MANAGING AND DELIVERING EVENTS JUST GOT SIMPLE
+                    </h2>
+                    <div class="max-w-4xl mx-auto">
+                        <h3 class="text-3xl md:text-4xl font-bold mb-8 text-[#00dee3]">
+                            GIGNITE DOES THE HEAVY-LIFTING, FREEING YOU TO FOCUS ON THE MUSIC
+                        </h3>
+                        <p class="text-xl md:text-2xl font-light mb-12 leading-relaxed">
+                            Taking all your admin headaches away, Gignite puts all the information and resources you need at your fingertips. From venue info, travel and logistics, through to marketing and merch and all the fine details that make for outstanding events. With all the bookings and info in one place, planned to perfection and with clarity and transparency on the financials, you can drive a more rewarding future for your band.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section id="features-section" class="py-16 md:py-24 bg-gray-900/50 px-6 section-bg" style="background-image: url('https://i.ibb.co/qLbnRCYk/orange-blue-lights.png');">
+                <div class="container mx-auto">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+                        <div class="feature-card">
+                            <div class="feature-card-inner bg-black/50 p-6 rounded-xl backdrop-filter backdrop-blur-md">
+                                <div class="mb-2 flex flex-col items-center">
+                                    <i class="fa-solid fa-list-check fa-2x text-[#00dee3]" aria-hidden="true"></i>
+                                    <div class="w-1/2 my-3 h-[3px] bg-white"></div>
+                                </div>
+                                <h3 class="text-xl font-bold text-center mb-4">End-to-end event control</h3>
+                                <div class="w-1/3 my-2 mx-auto h-[3px] bg-white"></div>
+                                <p class="font-light text-center">Be guided through a step-by-step process, evaluate options and make a booking with confidence.</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-inner bg-black/50 p-6 rounded-xl backdrop-filter backdrop-blur-md">
+                                <div class="mb-2 flex flex-col items-center">
+                                    <i class="fa-solid fa-user-tie fa-2x text-[#00dee3]" aria-hidden="true"></i>
+                                    <div class="w-1/2 my-3 h-[3px] bg-white"></div>
+                                </div>
+                                <h3 class="text-xl font-bold text-center mb-4">Your virtual tour manager</h3>
+                                <div class="w-1/3 my-2 mx-auto h-[3px] bg-white"></div>
+                                <p class="font-light text-center">System prompts will ensure no details are overlooked. From customs paperwork for equipment through to visas for your band.</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-inner bg-black/50 p-6 rounded-xl backdrop-filter backdrop-blur-md">
+                                <div class="mb-2 flex flex-col items-center">
+                                    <i class="fa-solid fa-megaphone fa-2x text-[#00dee3]" aria-hidden="true"></i>
+                                    <div class="w-1/2 my-3 h-[3px] bg-white"></div>
+                                </div>
+                                <h3 class="text-xl font-bold text-center mb-4">Marketing for gig success</h3>
+                                <div class="w-1/3 my-2 mx-auto h-[3px] bg-white"></div>
+                                <p class="font-light text-center">Our tech helps you create tour posters and promotions, through to branding and ordering tour merchandise.</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-inner bg-black/50 p-6 rounded-xl backdrop-filter backdrop-blur-md">
+                                <div class="mb-2 flex flex-col items-center">
+                                    <i class="fa-solid fa-truck-fast fa-2x text-[#00dee3]" aria-hidden="true"></i>
+                                    <div class="w-1/2 my-3 h-[3px] bg-white"></div>
+                                </div>
+                                <h3 class="text-xl font-bold text-center mb-4">Streamlining logistics and operations</h3>
+                                <div class="w-1/3 my-2 mx-auto h-[3px] bg-white"></div>
+                                <p class="font-light text-center">Efficiency and sustainability are built in with tour dates planned to minimise road and air miles to reduce your costs and carbon footprint.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-12">
+                        <p class="text-2xl font-bold mb-6">No subscription fees</p>
+                        <p class="text-lg font-light max-w-2xl mx-auto">The platform access is free for artists and bands. Gignite was created to increase your revenues.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section id="benefits-section" class="py-20 md:py-32 px-6 section-bg" style="background-image: url('https://i.ibb.co/n8160CbR/behind-desk-mixing-stage-artists.png');">
+                <div class="container mx-auto">
+                    <div class="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+                        <div class="text-center">
+                            <div class="mb-6">
+                                <i class="fa-solid fa-sliders fa-3x text-[#00dee3]" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">You are in control</h3>
+                            <p class="font-light text-lg">All details, correspondence and orders are in one place. So you're in charge.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="mb-6">
+                                <i class="fa-solid fa-star fa-3x text-[#00dee3]" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">Better event experiences</h3>
+                            <p class="font-light text-lg">Smooth-running events are a joy for you and your fans. The performance rules.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="mb-6">
+                                <i class="fa-solid fa-chart-line fa-3x text-[#00dee3]" aria-hidden="true"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">Success you can measure</h3>
+                            <p class="font-light text-lg">Understand gig profitability from the outset to actively build your career and reputation.</p>
+                        </div>
+                    </div>
+                    <div class="mt-16 text-center">
+                        <a href="#" class="glitch-button uppercase tracking-widest">Get Started</a>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="section-divider"></div>
+        </main>
+
+        <footer class="py-12 md:py-16 px-6 section-bg" style="background-image: url('https://images.unsplash.com/photo-1582215994439-50a8b31c1932?q=80&w=1974&auto=format&fit=crop');">
+            <div class="container mx-auto text-center text-white">
+                <p class="text-2xl font-bold tracking-wider mb-4">Ready to get started?</p>
+                <a href="#" class="glitch-button uppercase tracking-widest">
+                    Sign Up as an Artist
+                </a>
+                <p class="mt-8 tracking-wider">&copy; 2025 Gignite. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Logo Animation (from Supplier Registration page) ---
+            const logoStack = document.querySelector('.logo-stack');
+            if (logoStack) {
+                const logoItems = Array.from(logoStack.children);
+                let allLetters = [];
+                let idleAnimationInterval = null;
+                const idleOpacities = [1, 0.5, 0.3, 0.15, 0.05];
+
+                const hexToRgb = (hex) => {
+                    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
+                    return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : [0, 222, 227];
+                };
+                
+                const brandBlueHex = getComputedStyle(document.documentElement).getPropertyValue('--brand-blue');
+                const brandBlueRgbArray = hexToRgb(brandBlueHex);
+                const brandBlueRgbString = `rgb(${brandBlueRgbArray.join(', ')})`;
+                const whiteRgbString = 'rgb(255, 255, 255)';
+
+                logoItems.forEach(item => {
+                    const text = item.textContent;
+                    item.innerHTML = '';
+                    text.split('').forEach(char => {
+                        const span = document.createElement('span');
+                        span.textContent = char;
+                        item.appendChild(span);
+                    });
+                    allLetters.push(...Array.from(item.children));
+                });
+
+                const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+                const getCenter = (el) => {
+                    const rect = el.getBoundingClientRect();
+                    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                };
+
+                const getDistance = (p1, p2) => {
+                    return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                };
+
+                const resetToIdleState = () => {
+                    logoItems.forEach((item, itemIndex) => {
+                        Array.from(item.children).forEach(span => {
+                            span.style.opacity = idleOpacities[itemIndex];
+                            span.style.color = whiteRgbString;
+                        });
+                    });
+                };
+
+                const runNewAnimation = async () => {
+                    for (let i = 0; i < logoItems.length; i++) {
+                        logoItems.forEach((item, index) => {
+                            let newOpacity;
+                            let newColor = whiteRgbString;
+                            
+                            if (index === i) {
+                                newOpacity = '1';
+                            } else if (index < i) {
+                                newOpacity = '0.1';
+                                newColor = brandBlueRgbString;
+                            } else {
+                                newOpacity = '0';
+                            }
+                            
+                            Array.from(item.children).forEach(span => {
+                                span.style.opacity = newOpacity;
+                                span.style.color = newColor;
+                            });
+                        });
+                        await sleep(333);
+                    }
+
+                    await sleep(500);
+
+                    logoItems.forEach(item => {
+                        Array.from(item.children).forEach(span => {
+                            span.style.opacity = '0';
+                        });
+                    });
+
+                    await sleep(50);
+
+                    resetToIdleState();
+                };
+
+                const startIdleAnimation = () => {
+                    if (idleAnimationInterval) clearInterval(idleAnimationInterval);
+                    idleAnimationInterval = setInterval(runNewAnimation, 8000);
+                };
+                
+                logoStack.addEventListener('mouseenter', () => {
+                    clearInterval(idleAnimationInterval);
+                });
+                
+                logoStack.addEventListener('mouseleave', () => {
+                    resetToIdleState();
+                    startIdleAnimation();
+                });
+
+                allLetters.forEach(letter => {
+                    letter.addEventListener('mouseenter', () => {
+                        const hoveredCenter = getCenter(letter);
+                        const maxDist = getDistance(getCenter(logoStack.firstElementChild.firstElementChild), getCenter(logoStack.lastElementChild.lastElementChild));
+
+                        allLetters.forEach(otherLetter => {
+                            const otherCenter = getCenter(otherLetter);
+                            const distance = getDistance(hoveredCenter, otherCenter);
+                            
+                            const opacity = Math.max(0.1, 1 - (distance / (maxDist * 0.2)));
+                            otherLetter.style.opacity = opacity;
+                            otherLetter.style.color = whiteRgbString;
+                        });
+                    });
+                });
+
+                resetToIdleState();
+                startIdleAnimation();
+            }
+
+            // --- Particle Canvas Logic ---
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                setTimeout(() => {
+                    canvas.style.opacity = 1;
+                }, 2500);
+
+                const heroSectionForObserver = document.getElementById('hero-section');
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                const colors = ['rgba(255, 255, 255, 0.7)', 'rgba(255, 215, 0, 0.7)', 'rgba(255, 165, 0, 0.7)'];
+                
+                const resizeCanvas = () => {
+                    if (!canvas.offsetWidth || !canvas.offsetHeight) return;
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = canvas.offsetHeight;
+                };
+
+                const createParticles = () => {
+                    const particleCount = window.innerWidth > 768 ? 150 : 75;
+                    particles = [];
+                    for (let i = 0; i < particleCount; i++) {
+                        const finalSize = Math.random() * 4 + 1.5;
+                        const x = Math.random() * canvas.width;
+                        const y = Math.random() * canvas.height;
+                        const speed = Math.random() * 0.3 + 0.1;
+                        const angle = Math.atan2(y - canvas.height / 2, x - canvas.width / 2);
+                        const isFuzzy = Math.random() > 0.5;
+                        particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, finalSize, finalOpacity: Math.random() * 0.5 + 0.1, color: colors[Math.floor(Math.random() * colors.length)], life: Math.random() * 120, maxLife: 120, isFuzzy });
+                    }
+                };
+
+                const animateParticles = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life++;
+                        
+                        const particleRadius = p.finalSize * 2.5 + 20;
+                        if (p.x < -particleRadius || p.x > canvas.width + particleRadius || p.y < -particleRadius || p.y > canvas.height + particleRadius) {
+                            p.x = canvas.width / 2;
+                            p.y = canvas.height / 2;
+                            p.life = 0;
+                        }
+
+                        const lifeRatio = Math.min(p.life / p.maxLife, 1);
+                        const currentSize = p.finalSize * lifeRatio * 2.5;
+                        const currentOpacity = p.finalOpacity * lifeRatio;
+                        
+                        ctx.beginPath();
+                        ctx.globalAlpha = currentOpacity;
+
+                        if (p.isFuzzy && currentSize > 0) {
+                            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, currentSize);
+                            const baseColor = p.color.substring(0, p.color.lastIndexOf(','));
+                            gradient.addColorStop(0, `${baseColor}, 0.5)`);
+                            gradient.addColorStop(0.5, `${baseColor}, 0.2)`);
+                            gradient.addColorStop(1, `${baseColor}, 0)`);
+                            ctx.fillStyle = gradient;
+                            ctx.shadowBlur = 0;
+                        } else {
+                            ctx.fillStyle = p.color;
+                            ctx.shadowColor = p.color;
+                            ctx.shadowBlur = 20;
+                        }
+                        
+                        ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    requestAnimationFrame(animateParticles);
+                };
+                
+                if (heroSectionForObserver && window.ResizeObserver) {
+                    const observer = new ResizeObserver(() => {
+                        resizeCanvas();
+                    });
+                    observer.observe(heroSectionForObserver);
+                }
+
+                window.addEventListener('resize', () => { 
+                    resizeCanvas(); 
+                    createParticles(); 
+                });
+
+                resizeCanvas();
+                createParticles();
+                animateParticles();
+            }
+
+            // --- Text Reveal Logic & BG Fade ---
+            const heroSection = document.getElementById('hero-section');
+            const highlightContainer = document.getElementById('highlight-container');
+            const valuePropSection = document.getElementById('value-prop-section');
+            const featuresSection = document.getElementById('features-section');
+            const benefitsSection = document.getElementById('benefits-section');
+
+            const revealElements = [
+                { el: document.getElementById('reveal-line-1'), delay: 200 },
+                { el: document.getElementById('reveal-phrase-1'), delay: 1500 },
+                { el: document.getElementById('reveal-phrase-2'), delay: 3000 },
+            ];
+            
+            revealElements.forEach(item => {
+                if(item.el) {
+                    setTimeout(() => item.el.classList.add('is-revealing'), item.delay);
+                }
+            });
+            
+            if (highlightContainer) {
+                setTimeout(() => {
+                    highlightContainer.classList.add('is-highlighting');
+                }, 1400);
+            }
+            
+            if (canvas) {
+                setTimeout(() => {
+                    canvas.style.transition = 'opacity 1s ease-out';
+                    canvas.style.opacity = 0;
+                }, 4500);
+            }
+
+            setTimeout(() => { 
+                if(heroSection) {
+                    heroSection.classList.add('bg-visible');
+                    heroSection.classList.add('hero-shrunk');
+                }
+                if (valuePropSection) {
+                    valuePropSection.classList.add('is-visible');
+                }
+                if(featuresSection) {
+                    featuresSection.classList.add('is-visible');
+                }
+                if(benefitsSection) {
+                    benefitsSection.classList.add('is-visible');
+                }
+            }, 5500);
+            
+            // --- Interactive Glitch Bar Logic ---
+            const dividers = document.querySelectorAll('.section-divider');
+            dividers.forEach(divider => {
+                const bar = document.createElement('div');
+                bar.className = 'glitch-bar-interactive';
+                bar.dataset.offset = (Math.random() - 0.5) * (window.innerWidth * 0.4);
+                bar.style.left = `${Math.random() * 80 + 10}%`;
+                divider.appendChild(bar);
+            });
+            
+            const glitchBars = document.querySelectorAll('.glitch-bar-interactive');
+            let mouseX = window.innerWidth / 2;
+            document.addEventListener('mousemove', (e) => { mouseX = e.clientX; });
+            
+            function updateBarPositions() {
+                glitchBars.forEach(bar => {
+                    if (!bar.classList.contains('glitching-1') && !bar.classList.contains('glitching-2') && !bar.classList.contains('glitching-3')) {
+                        const offset = parseFloat(bar.dataset.offset) || 0;
+                        const rect = bar.parentElement.getBoundingClientRect();
+                        const barWidth = bar.offsetWidth;
+                        const newLeft = (mouseX + offset) - rect.left;
+                        const clampedLeft = Math.max(0, Math.min(newLeft - barWidth / 2, rect.width - barWidth));
+                        bar.style.left = `${clampedLeft}px`;
+                    }
+                });
+                requestAnimationFrame(updateBarPositions);
+            }
+            
+            function triggerRandomGlitch() {
+                setTimeout(() => {
+                    const nonGlitchingBars = Array.from(glitchBars).filter(b => !b.className.includes('glitching'));
+                    if (nonGlitchingBars.length > 0) {
+                        const randomBar = nonGlitchingBars[Math.floor(Math.random() * nonGlitchingBars.length)];
+                        const glitchType = Math.ceil(Math.random() * 3);
+                        const glitchClass = `glitching-${glitchType}`;
+                        randomBar.classList.add(glitchClass);
+                        randomBar.style.setProperty('--cursor-x', randomBar.style.left);
+                        randomBar.addEventListener('animationend', () => randomBar.classList.remove(glitchClass), { once: true });
+                    }
+                    triggerRandomGlitch();
+                }, Math.random() * 4000 + 2000);
+            }
+            
+            updateBarPositions();
+            triggerRandomGlitch();
+            
+            // --- Apple TV Hover Effect for Feature Cards ---
+            document.querySelectorAll('.feature-card').forEach(card => {
+                const inner = card.querySelector('.feature-card-inner');
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                    const rotateY = 15 * ((x - rect.width / 2) / (rect.width / 2));
+                    const rotateX = -15 * ((y - rect.height / 2) / (rect.height / 2));
+                    inner.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                    inner.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    inner.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+                    inner.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
