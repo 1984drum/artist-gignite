@@ -36,7 +36,6 @@
             z-index: 5;
             pointer-events: none;
             filter: url(#gooey);
-            backdrop-filter: brightness(1.2) saturate(1) contrast(1);
             opacity: 0.45;
         }
 
@@ -51,9 +50,10 @@
             pointer-events: none;
             z-index: 10;
             mix-blend-mode: overlay;
+            backdrop-filter: brightness(1.2) saturate(1) contrast(1);
             filter: none;
             transform: translate(-50%, -50%);
-            transition: width 0.4s ease, height 0.4s ease, background 0.4s ease, mix-blend-mode 0.4s ease;
+            transition: width 0.4s ease, height 0.4s ease, background 0.4s ease, mix-blend-mode 0.4s ease, backdrop-filter 0.4s ease;
         }
 
         /* Custom slider styles */
@@ -278,9 +278,8 @@
                 const gradient = `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`;
 
                 const invertFilter = state.invert ? 'invert(1)' : 'invert(0)';
-                const filter = `brightness(${state.brightness}) saturate(${state.saturate}) contrast(${state.contrast}) ${invertFilter}`;
+                const backdropFilter = `brightness(${state.brightness}) saturate(${state.saturate}) contrast(${state.contrast}) ${invertFilter}`;
 
-                blobContainer.style.backdropFilter = filter;
                 blobContainer.style.opacity = state.effectOpacity;
 
                 allBlobs.forEach((el, index) => {
@@ -289,10 +288,11 @@
                     el.style.height = `${state.size * scaleFactor}px`;
                     el.style.background = gradient;
                     el.style.mixBlendMode = 'overlay';
+                    el.style.backdropFilter = backdropFilter;
                     el.style.filter = 'none';
 
                     const duration = 0.4 + (index * 0.1);
-                    el.style.transition = `width ${duration}s ease, height ${duration}s ease, background ${duration}s ease, mix-blend-mode ${duration}s ease`;
+                    el.style.transition = `width ${duration}s ease, height ${duration}s ease, background ${duration}s ease, mix-blend-mode ${duration}s ease, backdrop-filter ${duration}s ease`;
 
                     if (index > 0) {
                         el.style.opacity = 1 - (index * 0.2);
