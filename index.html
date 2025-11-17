@@ -4,405 +4,423 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gooey Blob Cursor Effect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            overflow: hidden;
-            cursor: none;
-            font-family: 'Arial', sans-serif;
-            background: #000;
-        }
-
-        #background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            font-family: "Inter", sans-serif;
+            background-color: #000;
             background-image: url('https://gignite-artists.netlify.app/img/1984drum_A_dynamic_long-exposure_photograph._The_static_stage_1d984278-e076-4baa-9338-daf1edf5dae0_1.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            z-index: 1;
+            min-height: 100vh;
+            width: 100%;
+            cursor: none;
+            overflow: hidden;
+            position: relative;
         }
 
-        #cursor-container {
+        #svg-filters {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        #blob-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            filter: url(#gooey);
+            backdrop-filter: brightness(1.2) saturate(1) contrast(1);
+            opacity: 0.45;
+        }
+
+        .blob {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
             pointer-events: none;
             z-index: 10;
+            mix-blend-mode: overlay;
+            filter: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease, background 0.4s ease, mix-blend-mode 0.4s ease;
         }
 
-        .cursor-blob {
-            position: absolute;
-            border-radius: 50%;
-            background: #fff;
-            mix-blend-mode: screen;
-            will-change: transform;
-            filter: blur(15px);
-        }
-
-        #gooey-filter {
-            position: absolute;
-            width: 0;
-            height: 0;
-        }
-
-        #control-panel {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.95);
-            padding: 30px 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-            cursor: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .control-group {
-            margin-bottom: 20px;
-        }
-
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .control-label {
-            display: block;
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .control-value {
-            float: right;
-            color: #00dee3;
-            font-weight: normal;
-        }
-
+        /* Custom slider styles */
         input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            outline: none;
             -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #4a5568;
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
         }
-
+        input[type="range"]:hover {
+            opacity: 1;
+        }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 18px;
             height: 18px;
+            background: #38bdf8;
             border-radius: 50%;
-            background: #00dee3;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 222, 227, 0.5);
         }
-
         input[type="range"]::-moz-range-thumb {
             width: 18px;
             height: 18px;
+            background: #38bdf8;
             border-radius: 50%;
-            background: #00dee3;
             cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 8px rgba(0, 222, 227, 0.5);
-        }
-
-        .panel-title {
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            min-width: 600px;
-        }
-
-        @media (max-width: 768px) {
-            .controls-grid {
-                grid-template-columns: 1fr;
-                min-width: 300px;
-            }
-
-            #control-panel {
-                padding: 20px 25px;
-                bottom: 20px;
-            }
         }
     </style>
 </head>
-<body>
-    <div id="background"></div>
+<body class="text-white">
 
-    <svg id="gooey-filter">
+    <svg id="svg-filters">
         <defs>
             <filter id="gooey">
-                <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
-                <feColorMatrix in="blur" mode="matrix"
+                <feGaussianBlur id="goo-blur" in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix id="goo-contrast" in="blur" mode="matrix"
                     values="1 0 0 0 0
                             0 1 0 0 0
                             0 0 1 0 0
                             0 0 0 18 -7"
                     result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                <feBlend in="SourceGraphic" in2="goo" />
             </filter>
         </defs>
     </svg>
 
-    <div id="cursor-container" style="filter: url(#gooey);">
-        <!-- Cursor blobs will be added here dynamically -->
+    <div id="blob-container">
+        <div id="blob" class="blob"></div>
     </div>
 
-    <div id="control-panel">
-        <div class="panel-title">Gooey Blob Controls</div>
-        <div class="controls-grid">
-            <div class="control-group">
-                <label class="control-label">
-                    Size
-                    <span class="control-value" id="size-value">40</span>
-                </label>
-                <input type="range" id="size" min="20" max="800" value="40" step="5">
+    <div id="controls" class="fixed bottom-0 left-0 right-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm p-4 rounded-t-lg shadow-lg z-50">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-4 text-sm">
+
+            <!-- Column 1: Base Shape & Opacity -->
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label for="size" class="font-medium">Size: <span id="size-val">400</span>px</label>
+                    <input type="range" id="size" min="50" max="1000" value="400" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <label for="effectOpacity" class="font-medium">Effect Opacity: <span id="effectOpacity-val">0.45</span></label>
+                    <input type="range" id="effectOpacity" min="0" max="1" value="0.45" step="0.05" class="w-full">
+                </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label">
-                    Contrast
-                    <span class="control-value" id="contrast-value">18</span>
-                </label>
-                <input type="range" id="contrast" min="10" max="30" value="18" step="1">
+            <!-- Column 2: SVG Gooey Effect -->
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label for="gooeyBlurSVG" class="font-medium">Gooey Blur: <span id="gooeyBlurSVG-val">10</span></label>
+                    <input type="range" id="gooeyBlurSVG" min="0" max="50" value="10" step="1" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <label for="gooeySharpnessSVG" class="font-medium">Gooey Sharpness: <span id="gooeySharpnessSVG-val">18</span></label>
+                    <input type="range" id="gooeySharpnessSVG" min="1" max="50" value="18" step="1" class="w-full">
+                </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label">
-                    Brightness
-                    <span class="control-value" id="brightness-value">100</span>
-                </label>
-                <input type="range" id="brightness" min="50" max="150" value="100" step="1">
+            <!-- Column 3: Backdrop Filters -->
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label for="brightness" class="font-medium">Brightness: <span id="brightness-val">1.2</span></label>
+                    <input type="range" id="brightness" min="0.5" max="3" value="1.2" step="0.1" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <label for="saturate" class="font-medium">Saturation: <span id="saturate-val">1</span></label>
+                    <input type="range" id="saturate" min="0" max="3" value="1" step="0.1" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <label for="contrast" class="font-medium">Contrast: <span id="contrast-val">1</span></label>
+                    <input type="range" id="contrast" min="0" max="5" value="1" step="0.1" class="w-full">
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="invert" class="h-4 w-4 text-sky-500 rounded border-gray-400 focus:ring-sky-500">
+                    <label for="invert" class="font-medium">Invert Colors</label>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label">
-                    Saturation
-                    <span class="control-value" id="saturation-value">100</span>
-                </label>
-                <input type="range" id="saturation" min="0" max="200" value="100" step="1">
+            <!-- Column 4: Animation -->
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label for="pulseSpeed" class="font-medium">Pulse Speed: <span id="pulseSpeed-val">0.2</span></label>
+                    <input type="range" id="pulseSpeed" min="0" max="2" value="0.2" step="0.1" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <label for="pulseAmount" class="font-medium">Pulse Amount: <span id="pulseAmount-val">0.05</span></label>
+                    <input type="range" id="pulseAmount" min="0" max="0.2" value="0.05" step="0.01" class="w-full">
+                </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label">
-                    Pulse Amount
-                    <span class="control-value" id="pulse-value">20</span>
-                </label>
-                <input type="range" id="pulse" min="0" max="50" value="20" step="1">
+            <!-- Column 5: Trail -->
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label for="trailLag" class="font-medium">Trail Lag: <span id="trailLag-val">0.06</span></label>
+                    <input type="range" id="trailLag" min="0.02" max="0.2" value="0.06" step="0.01" class="w-full">
+                </div>
+                <div class="space-y-1">
+                    <label for="trailCount" class="font-medium">Trail Count: <span id="trailCount-val">3</span></label>
+                    <input type="range" id="trailCount" min="0" max="10" value="3" step="1" class="w-full">
+                </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label">
-                    Trail Lag
-                    <span class="control-value" id="lag-value">0.15</span>
-                </label>
-                <input type="range" id="lag" min="0.05" max="0.3" value="0.15" step="0.01">
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">
-                    Animation Speed
-                    <span class="control-value" id="speed-value">1.0</span>
-                </label>
-                <input type="range" id="speed" min="0.1" max="3.0" value="1.0" step="0.1">
-            </div>
         </div>
     </div>
 
     <script>
-        class GooeyCursor {
-            constructor() {
-                this.container = document.getElementById('cursor-container');
-                this.controlPanel = document.getElementById('control-panel');
-                this.blobs = [];
-                this.numBlobs = 15;
-                this.mouseX = window.innerWidth / 2;
-                this.mouseY = window.innerHeight / 2;
-                this.isOverPanel = false;
-                this.circleAngle = 0;
+        document.addEventListener('DOMContentLoaded', () => {
+            const blob = document.getElementById('blob');
+            const blobContainer = document.getElementById('blob-container');
+            const controls = document.getElementById('controls');
+            let trailBlobs = [];
+            let allBlobs = [blob];
 
-                // Parameters
-                this.params = {
-                    size: 40,
-                    contrast: 18,
-                    brightness: 100,
-                    saturation: 100,
-                    pulse: 20,
-                    lag: 0.15,
-                    speed: 1.0
-                };
+            const feGaussianBlur = document.getElementById('goo-blur');
+            const feColorMatrix = document.getElementById('goo-contrast');
 
-                this.init();
-                this.setupControls();
-                this.animate();
-            }
+            // Control elements
+            const sizeSlider = document.getElementById('size');
+            const brightnessSlider = document.getElementById('brightness');
+            const effectOpacitySlider = document.getElementById('effectOpacity');
+            const saturateSlider = document.getElementById('saturate');
+            const contrastSlider = document.getElementById('contrast');
+            const invertCheckbox = document.getElementById('invert');
+            const gooeyBlurSVGSlider = document.getElementById('gooeyBlurSVG');
+            const gooeySharpnessSVGSlider = document.getElementById('gooeySharpnessSVG');
+            const pulseSpeedSlider = document.getElementById('pulseSpeed');
+            const pulseAmountSlider = document.getElementById('pulseAmount');
+            const trailLagSlider = document.getElementById('trailLag');
+            const trailCountSlider = document.getElementById('trailCount');
 
-            init() {
-                // Create blobs
-                for (let i = 0; i < this.numBlobs; i++) {
-                    const blob = document.createElement('div');
-                    blob.className = 'cursor-blob';
-                    blob.style.width = `${this.params.size}px`;
-                    blob.style.height = `${this.params.size}px`;
-                    this.container.appendChild(blob);
+            // Value labels
+            const sizeVal = document.getElementById('size-val');
+            const brightnessVal = document.getElementById('brightness-val');
+            const effectOpacityVal = document.getElementById('effectOpacity-val');
+            const saturateVal = document.getElementById('saturate-val');
+            const contrastVal = document.getElementById('contrast-val');
+            const gooeyBlurSVGVal = document.getElementById('gooeyBlurSVG-val');
+            const gooeySharpnessSVGVal = document.getElementById('gooeySharpnessSVG-val');
+            const pulseSpeedVal = document.getElementById('pulseSpeed-val');
+            const pulseAmountVal = document.getElementById('pulseAmount-val');
+            const trailLagVal = document.getElementById('trailLag-val');
+            const trailCountVal = document.getElementById('trailCount-val');
 
-                    this.blobs.push({
-                        element: blob,
-                        x: this.mouseX,
-                        y: this.mouseY,
-                        vx: 0,
-                        vy: 0
-                    });
+            // State object
+            const state = {
+                size: 400,
+                brightness: 1.2,
+                effectOpacity: 0.45,
+                saturate: 1,
+                contrast: 1,
+                invert: false,
+                gooeyBlurSVG: 10,
+                gooeySharpnessSVG: 18,
+                pulseSpeed: 0.2,
+                pulseAmount: 0.05,
+                trailLag: 0.06,
+                trailCount: 3,
+                isPanelHovered: false
+            };
+
+            // Animation & Position State
+            const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let positions = [{ x: window.innerWidth / 2, y: window.innerHeight / 2 }];
+
+            // Function to adjust trail blobs
+            function updateTrailCount(newCount) {
+                const oldCount = trailBlobs.length;
+
+                if (newCount > oldCount) {
+                    for (let i = oldCount; i < newCount; i++) {
+                        const newTrailBlob = document.createElement('div');
+                        newTrailBlob.className = 'blob';
+                        blobContainer.appendChild(newTrailBlob);
+                        trailBlobs.push(newTrailBlob);
+                        const lastPos = positions[positions.length - 1];
+                        positions.push({ x: lastPos.x, y: lastPos.y });
+                    }
+                } else if (newCount < oldCount) {
+                    for (let i = newCount; i < oldCount; i++) {
+                        const blobToRemove = trailBlobs.pop();
+                        blobToRemove.remove();
+                        positions.pop();
+                    }
                 }
 
-                // Mouse move listener
-                document.addEventListener('mousemove', (e) => {
-                    if (!this.isOverPanel) {
-                        this.mouseX = e.clientX;
-                        this.mouseY = e.clientY;
+                allBlobs = [blob, ...trailBlobs];
+                updateBlobStyle();
+            }
+
+            function lerp(start, end, amt) {
+                return (1 - amt) * start + amt * end;
+            }
+
+            function updateBlobStyle() {
+                const colorStart = `rgba(255, 255, 255, 1)`;
+                const colorEnd = `rgba(255, 255, 255, 0)`;
+                const gradient = `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`;
+
+                const invertFilter = state.invert ? 'invert(1)' : 'invert(0)';
+                const filter = `brightness(${state.brightness}) saturate(${state.saturate}) contrast(${state.contrast}) ${invertFilter}`;
+
+                blobContainer.style.backdropFilter = filter;
+                blobContainer.style.opacity = state.effectOpacity;
+
+                allBlobs.forEach((el, index) => {
+                    const scaleFactor = 1 - (index * 0.15);
+                    el.style.width = `${state.size * scaleFactor}px`;
+                    el.style.height = `${state.size * scaleFactor}px`;
+                    el.style.background = gradient;
+                    el.style.mixBlendMode = 'overlay';
+                    el.style.filter = 'none';
+
+                    const duration = 0.4 + (index * 0.1);
+                    el.style.transition = `width ${duration}s ease, height ${duration}s ease, background ${duration}s ease, mix-blend-mode ${duration}s ease`;
+
+                    if (index > 0) {
+                        el.style.opacity = 1 - (index * 0.2);
+                        el.style.zIndex = 9 - (index - 1);
+                    } else {
+                        el.style.zIndex = 10;
                     }
                 });
-
-                // Panel hover detection
-                this.controlPanel.addEventListener('mouseenter', () => {
-                    this.isOverPanel = true;
-                    this.circleAngle = 0;
-                });
-
-                this.controlPanel.addEventListener('mouseleave', () => {
-                    this.isOverPanel = false;
-                });
             }
 
-            setupControls() {
-                const controls = ['size', 'contrast', 'brightness', 'saturation', 'pulse', 'lag', 'speed'];
+            // Main Animation Loop
+            function animateLoop(time) {
+                let targetX, targetY;
 
-                controls.forEach(control => {
-                    const input = document.getElementById(control);
-                    const valueDisplay = document.getElementById(`${control}-value`);
-
-                    input.addEventListener('input', (e) => {
-                        const value = parseFloat(e.target.value);
-                        this.params[control] = value;
-                        valueDisplay.textContent = value;
-
-                        // Update filter for contrast
-                        if (control === 'contrast') {
-                            this.updateFilter();
-                        }
-
-                        // Update blob sizes
-                        if (control === 'size') {
-                            this.updateBlobSizes();
-                        }
-
-                        // Update brightness/saturation
-                        if (control === 'brightness' || control === 'saturation') {
-                            this.updateBlobColors();
-                        }
-                    });
-                });
-            }
-
-            updateFilter() {
-                const filter = document.querySelector('#gooey feColorMatrix');
-                filter.setAttribute('values',
-                    `1 0 0 0 0
-                     0 1 0 0 0
-                     0 0 1 0 0
-                     0 0 0 ${this.params.contrast} -7`
-                );
-            }
-
-            updateBlobSizes() {
-                this.blobs.forEach((blob) => {
-                    const baseSize = this.params.size;
-                    blob.element.style.width = `${baseSize}px`;
-                    blob.element.style.height = `${baseSize}px`;
-                });
-            }
-
-            updateBlobColors() {
-                const brightness = this.params.brightness / 100;
-                const saturation = this.params.saturation / 100;
-
-                this.container.style.filter = `url(#gooey) brightness(${brightness}) saturate(${saturation})`;
-            }
-
-            animate() {
-                // Calculate circular motion when over panel
-                if (this.isOverPanel) {
-                    const panelRect = this.controlPanel.getBoundingClientRect();
-                    const centerX = window.innerWidth / 2;
-                    const centerY = panelRect.top / 2;
-                    const radius = Math.min(window.innerWidth, window.innerHeight) / 6; // 1/3 of screen diameter = 1/6 radius
-
-                    // 8 seconds for full circle (2 * PI radians in 8000ms), affected by speed
-                    this.circleAngle += (2 * Math.PI * this.params.speed) / (8000 / 16.67); // assuming ~60fps
-
-                    this.mouseX = centerX + Math.cos(this.circleAngle) * radius;
-                    this.mouseY = centerY + Math.sin(this.circleAngle) * radius;
+                if (state.isPanelHovered) {
+                    const circleTime = time * (2 * Math.PI / 8000);
+                    const radius = Math.min(window.innerWidth, window.innerHeight) / 6;
+                    targetX = window.innerWidth / 2 + Math.cos(circleTime) * radius;
+                    targetY = window.innerHeight / 2 + Math.sin(circleTime) * radius;
+                } else {
+                    targetX = mouse.x;
+                    targetY = mouse.y;
                 }
 
-                // Update blob positions with lag
-                this.blobs.forEach((blob, index) => {
-                    const lag = this.params.lag * (index + 1);
-
-                    blob.vx += (this.mouseX - blob.x) * lag;
-                    blob.vy += (this.mouseY - blob.y) * lag;
-
-                    blob.vx *= 0.8;
-                    blob.vy *= 0.8;
-
-                    blob.x += blob.vx;
-                    blob.y += blob.vy;
-
-                    // Add pulse effect
-                    const time = Date.now() * 0.001;
-                    const pulseOffset = this.params.pulse * Math.sin(time * this.params.speed + index * 0.5);
-                    const currentSize = this.params.size + pulseOffset;
-
-                    blob.element.style.width = `${currentSize}px`;
-                    blob.element.style.height = `${currentSize}px`;
-                    blob.element.style.transform = `translate(${blob.x - currentSize / 2}px, ${blob.y - currentSize / 2}px)`;
+                positions.forEach((pos, index) => {
+                    const lag = state.trailLag * (index + 1);
+                    pos.x = lerp(pos.x, targetX, lag);
+                    pos.y = lerp(pos.y, targetY, lag);
+                    targetX = pos.x;
+                    targetY = pos.y;
                 });
 
-                requestAnimationFrame(() => this.animate());
-            }
-        }
+                const pulseTime = time * 0.001 * state.pulseSpeed;
+                const scale = 1 + Math.sin(pulseTime) * state.pulseAmount;
 
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            new GooeyCursor();
+                allBlobs.forEach((el, index) => {
+                    let transform = `translate(${positions[index].x}px, ${positions[index].y}px) translate(-50%, -50%)`;
+
+                    if (index === 0) {
+                        transform += ` scale(${scale})`;
+                    }
+                    el.style.borderRadius = '50%';
+                    el.style.transform = transform;
+                });
+
+                requestAnimationFrame(animateLoop);
+            }
+
+            // Event Listeners
+            document.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+
+            controls.addEventListener('mouseenter', () => {
+                state.isPanelHovered = true;
+                document.body.style.cursor = 'default';
+            });
+
+            controls.addEventListener('mouseleave', () => {
+                state.isPanelHovered = false;
+                document.body.style.cursor = 'none';
+            });
+
+            // Control Listeners
+            sizeSlider.addEventListener('input', (e) => {
+                state.size = e.target.value;
+                sizeVal.textContent = state.size;
+                updateBlobStyle();
+            });
+            brightnessSlider.addEventListener('input', (e) => {
+                state.brightness = e.target.value;
+                brightnessVal.textContent = state.brightness;
+                updateBlobStyle();
+            });
+            effectOpacitySlider.addEventListener('input', (e) => {
+                state.effectOpacity = e.target.value;
+                effectOpacityVal.textContent = state.effectOpacity;
+                blobContainer.style.opacity = state.effectOpacity;
+            });
+            saturateSlider.addEventListener('input', (e) => {
+                state.saturate = e.target.value;
+                saturateVal.textContent = state.saturate;
+                updateBlobStyle();
+            });
+            contrastSlider.addEventListener('input', (e) => {
+                state.contrast = e.target.value;
+                contrastVal.textContent = state.contrast;
+                updateBlobStyle();
+            });
+            invertCheckbox.addEventListener('change', (e) => {
+                state.invert = e.target.checked;
+                updateBlobStyle();
+            });
+            gooeyBlurSVGSlider.addEventListener('input', (e) => {
+                state.gooeyBlurSVG = e.target.value;
+                gooeyBlurSVGVal.textContent = state.gooeyBlurSVG;
+                feGaussianBlur.setAttribute('stdDeviation', state.gooeyBlurSVG);
+            });
+            gooeySharpnessSVGSlider.addEventListener('input', (e) => {
+                state.gooeySharpnessSVG = e.target.value;
+                gooeySharpnessSVGVal.textContent = state.gooeySharpnessSVG;
+                const matrix = `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${state.gooeySharpnessSVG} -7`;
+                feColorMatrix.setAttribute('values', matrix);
+            });
+            pulseSpeedSlider.addEventListener('input', (e) => {
+                state.pulseSpeed = e.target.value;
+                pulseSpeedVal.textContent = state.pulseSpeed;
+            });
+            pulseAmountSlider.addEventListener('input', (e) => {
+                state.pulseAmount = e.target.value;
+                pulseAmountVal.textContent = state.pulseAmount;
+            });
+            trailLagSlider.addEventListener('input', (e) => {
+                state.trailLag = e.target.value;
+                trailLagVal.textContent = state.trailLag;
+            });
+            trailCountSlider.addEventListener('input', (e) => {
+                const newCount = parseInt(e.target.value, 10);
+                state.trailCount = newCount;
+                trailCountVal.textContent = state.trailCount;
+                updateTrailCount(newCount);
+            });
+
+            // Initial setup
+            updateTrailCount(state.trailCount);
+            updateBlobStyle();
+            requestAnimationFrame(animateLoop);
         });
     </script>
 </body>
